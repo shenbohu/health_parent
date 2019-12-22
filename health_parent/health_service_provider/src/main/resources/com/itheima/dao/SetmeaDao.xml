@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.dao.SetmeaDao">
+    <!-- - - - - - - - 条件查询- - - - - - - - - - -  - - - - -->
+    <select id="selectByCondition" parameterType="string" resultType="setmeal">
+        select * from t_setmeal
+        <if test="value!=null and value.length>0">
+            where code=#{value} or name=#{value} or helpCode=#{value}
+        </if>
+    </select>
+
+    <!-- - - - - - - - 添加 Setmeal- - - - - - - - - - -  - - - - -->
+    <select id="maxid" resultType="int">
+           SELECT LAST_INSERT_ID ()
+    </select>
+    <insert id="addPRIMARY_KEY" parameterType="map">
+
+        insert into t_setmeal_checkgroup (setmeal_id,checkgroup_id) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.setmealid},#{item.checkgroupId})
+        </foreach>
+    </insert>
+
+
+    <insert id="add" keyProperty="setmeal">
+        insert into t_setmeal values (null,#{name},#{code},#{helpCode},#{sex},#{age},#{price},#{remark},#{attention},#{img});
+    </insert>
+
+    <!-- - - - - - - - 查询所有的 Setmeal- - - - - - - - - - -  - - - - -->
+    <select id="findAll" resultType="setmeal">
+      select * from t_setmeal
+</select>
+
+    <!-- - - - - - - - 根据ID查询 Setmeal- - - - - - - - - - -  - - - - -->
+
+    <resultMap id="map" type="setmeal">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="code" property="code"/>
+        <result column="helpCode" property="helpCode"/>
+        <result column="sex" property="sex"/>
+        <result column="age" property="age"/>
+        <result column="price" property="price"/>
+        <result column="remark" property="remark"/>
+        <result column="attention" property="attention"/>
+        <result column="img" property="img"/>
+        <collection property="checkGroups" ofType="checkGroup">
+            <id property="id" column="tcgid"/>
+            <result property="name" column="tcgname"/>
+            <result property="remark" column="tcgremark"/>
+            <collection property="checkItems" ofType="checkItem">
+                <id property="id" column="tckid"/>
+                <result property="name" column="tckname"/>
+            </collection>
+        </collection>
+    </resultMap>
+    <select id="findById" resultMap="map" parameterType="int">
+        SELECT
+          ts.`id`,
+          ts.`name`,
+          ts.`code`,
+          ts.`helpCode`,
+          ts.`sex`,
+          ts.`age`,
+          ts.`price`,
+          ts.`remark`,
+          ts.`attention`,
+          ts.img,
+          tcg.`id` tcgid,
+          tcg.`name` tcgname,
+          tck.`id` tckid,
+          tck.`name` tckname
+        FROM
+          t_setmeal ts,
+          t_setmeal_checkgroup tsc,
+          t_checkgroup tcg,
+          t_checkgroup_checkitem tcc,
+          t_checkitem tck
+        WHERE ts.`id` = tsc.`setmeal_id`
+          AND tsc.`checkgroup_id` = tcg.`id`
+          AND tcg.`id` = tcc.`checkgroup_id`
+          AND tcc.`checkitem_id` = tck.`id`
+          AND ts.`id` = #{id} ;
+        </select>
+
+</mapper>

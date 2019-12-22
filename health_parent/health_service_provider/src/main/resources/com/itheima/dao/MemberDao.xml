@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.dao.MemberDao">
+
+    <!-- - - - - -查询用户是否是会员 - - - -   - -->
+    <select id="isVIP" parameterType="string" resultType="member">
+     select * from t_member where phoneNumber=#{phoneNumber}
+ </select>
+
+    <!-- - - - - -添加会员 - - - -   - -->
+    <insert id="add" parameterType="member">
+        <selectKey resultType="int" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into
+        t_member
+        (fileNumber,name,sex,idCard,phoneNumber,
+        regTime,password,email,birthday,remark)
+        values
+        (#{fileNumber},#{name},#{sex},#{idCard},#{phoneNumber},
+        #{regTime},#{password},#{email},#{birthday},#{remark})
+    </insert>
+
+
+    <select id="infoMenber" parameterType="list" resultType="map">
+        <!-- SELECT
+         <foreach collection="list" item="regTime" separator="," >
+             (SELECT COUNT(t1.`id`) FROM `t_member` t1 WHERE t1.`regTime` &lt; #{regTime}) as '${regTime}'
+         </foreach>-->
+        SELECT
+        <foreach collection="list" item="regTime" separator=",">
+            (SELECT COUNT(t1.`id`) FROM `t_member` t1 WHERE t1.`regTime` &lt; #{regTime}) as ''${regTime}''
+        </foreach>
+
+    </select>
+
+    <select id="getSetmealReport" resultType="map">
+        SELECT COUNT(id) value,
+		   (SELECT NAME FROM t_setmeal WHERE id = setmeal_id ) name
+		FROM t_order GROUP BY setmeal_id
+    </select>
+
+    <select id="dateVIP" resultType="int">
+        select count(id) from t_member where regTime = DATE_FORMAT(CURDATE(),'%Y-%m-%d')
+    </select>
+    <select id="countVIP" resultType="int">
+       select count(id) from t_member
+    </select>
+    <select id="thisWeekNewMember" resultType="int">
+       select count(id) from t_member where
+	regTime >= DATE_FORMAT( SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')-1), '%Y-%m-%d')
+    </select>
+    <select id="thisMonthNewMember" resultType="int">
+       select count(id) from t_member where
+	regTime >= DATE_FORMAT( CURDATE(), '%Y-%m-01')
+    </select>
+    <select id="todayOrderNumber" resultType="int">
+       SELECT COUNT(id) FROM t_order WHERE orderDate = DATE_FORMAT(CURDATE(),'%Y-%m-%d')
+  </select>
+    <select id="todayVisitsNumber" resultType="int">
+       select count(id) from t_order where orderDate = DATE_FORMAT(now(),'%Y-%m-%d') and orderStatus='已到诊'
+  </select>
+    <select id="thisWeekOrderNumber" resultType="int">
+    select count(id) from t_order where
+	orderDate >= DATE_FORMAT( SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')-1), '%Y-%m-%d')
+	</select>
+    <select id="thisWeekVisitsNumber" resultType="int">
+   select count(id) from t_order where
+	orderDate >= DATE_FORMAT( SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')-1), '%Y-%m-%d') and orderStatus='已到诊'
+	</select>
+    <select id="thisMonthOrderNumber" resultType="int">
+   select count(id) from t_order where
+	orderDate >= DATE_FORMAT( CURDATE(), '%Y-%m-01')
+	</select>
+    <select id="thisMonthVisitsNumber" resultType="int">
+   select count(id) from t_order where
+	orderDate >= DATE_FORMAT( CURDATE(), '%Y-%m-01') and orderStatus='已到诊'
+	</select>
+    <select id="hotSetmeal" resultType="map">
+        select
+ (select name from t_setmeal where id = setmeal_id)name,
+ count(id) setmeal_count,
+ count(id)/(select count(id) from t_order) proportion
+
+ from t_order group by setmeal_id order by setmeal_count desc limit 0,3
+    </select>
+
+
+</mapper>

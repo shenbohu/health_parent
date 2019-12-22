@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.dao.OrderDao">
+
+
+    <select id="findByDate" parameterType="date" resultType="orderSetting">
+       select * from t_ordersetting where orderDate = #{orderDate}
+    </select>
+
+    <!-- 修改 t_ordersetting- - - - - - - - - - - - - - - - -->
+    <update id="update" parameterType="orderSetting">
+        update t_ordersetting
+        <set>
+            <if test="number!=null">
+                number = #{number},
+            </if>
+
+        </set>
+        where orderDate = #{orderDate}
+    </update>
+
+    <!--管理员设置的预约信息-->
+    <insert id="add" parameterType="orderSetting">
+         insert into t_ordersetting values (null,orderDate=#{orderDate},number=#{number},reservations=#{reservations});
+    </insert>
+
+    <insert id="adds" parameterType="orderSetting">
+        insert into t_ordersetting values
+        <foreach collection="list" item="item" separator=",">
+            (null ,#{item.orderDate},#{item.number},#{item.reservations})
+        </foreach>
+    </insert>
+    <!-- 查询 所查询月份的预约人数- - - - - - - - - - - - - - - - -->
+
+    <select id="appointment" parameterType="map" resultType="orderSetting">
+        select * from t_ordersetting where  orderDate between  #{begin} and #{end}
+    </select>
+
+
+    <select id="findCountByOrderDate" parameterType="date" resultType="long">
+        select t_ordersetting.`number` from t_ordersetting  where orderDate=#{orderDate}
+    </select>
+
+    <!--    查询 所预约日期剩余预约人数-->
+    <select id="mayNumber" parameterType="date" resultType="int">
+        SELECT (number-reservations) FROM  t_ordersetting WHERE orderDate=#{orderDate}
+    </select>
+
+    <!--    查询 当前用户是否进行了预约-->
+    <resultMap id="findmap" type="order">
+        <id column="id" property="id"></id>
+        <result property="memberId" column="member_id"></result>
+        <result property="orderDate" column="orderDate"></result>
+        <result property="orderType" column="orderType"></result>
+        <result property="orderStatus" column="orderStatus"></result>
+        <result property="setmealId" column="setmeal_id"></result>
+    </resultMap>
+
+    <select id="findByCondition" parameterType="order" resultMap="findmap">
+        SELECT * FROM  t_order WHERE member_id=#{memberId} and orderDate=#{orderDate} and setmeal_id=#{setmealId}
+    </select>
+    <!--    设置可预约人数减一-->
+    <update id="updatereservations" parameterType="member">
+            update t_ordersetting set reservations = reservations+1  where orderDate = #{orderDate}
+    </update>
+
+    <!--    添加预约-->
+    <insert id="addorder" parameterType="order">
+        <selectKey resultType="int" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into t_order values (
+        null ,#{memberId},#{orderDate},#{orderType},#{orderStatus},#{setmealId}
+        )
+    </insert>
+
+
+    <select id="findById" parameterType="int" resultType="succeed">
+         SELECT
+           t_o.`orderDate`,
+           t_o.`orderType`,
+           t_m.`name` member,
+           t_s.`name` setmeal
+        FROM
+              t_order t_o,
+              t_member t_m,
+              t_setmeal t_s
+        WHERE
+              t_o.`id` = #{id}
+              AND t_o.`member_id` = t_m.`id`
+              AND t_o.`setmeal_id` = t_s.`id` ;
+
+    </select>
+
+
+</mapper>

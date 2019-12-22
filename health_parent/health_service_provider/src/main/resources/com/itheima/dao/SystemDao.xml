@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.dao.SystemDao">
+    <!-- - - - - - - - 条件查询- - - - - - - - - - -  - - - - -->
+    <select id="selectByCondition" parameterType="string" resultType="user">
+        select * from t_user
+        <if test="value!=null and value.length>0">
+            where username=#{value}
+        </if>
+    </select>
+
+
+    <!-- - - - - - - - 查询所有的角色- - - - - - - - - - -  - - - - -->
+    <select id="findAllRoles" resultType="role">
+        select * from t_role
+    </select>
+
+    <!-- - - - - - - - 添加 主键- - - - - - - - - - -  - - - - -->
+
+    <insert id="addPRIMARY_KEY" parameterType="map">
+
+        insert into t_user_role (user_id,role_id) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.userid},#{item.roleid})
+        </foreach>
+    </insert>
+
+
+    <!--    添加user-->
+    <insert id="addUser" parameterType="user">
+        <selectKey resultType="int" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into t_user values (
+        null ,#{birthday},#{gender},#{username},#{password},#{remark},#{station},#{telephone}
+        )
+    </insert>
+
+    <!--    查询用户名是否重复-->
+    <select id="isrepetition" parameterType="string" resultType="user">
+        select * from t_user where username=#{username}
+    </select>
+
+    <!--    删除用户-->
+    <delete id="deleteByIdMiddle" parameterType="int">
+        delete from t_user_role where user_id=#{user_id}
+    </delete>
+    <delete id="deleteByIdUser" parameterType="int">
+        delete from t_user where id=#{id}
+     </delete>
+
+
+    <!--    删除用户-->
+    <delete id="deleteAllListMiddle" parameterType="int">
+        delete from t_user_role where user_id in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+    <delete id="deleteAllListUser" parameterType="int">
+        delete from t_user where id in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--根据用户id查询角色-->
+    <select id="findByUserId" resultType="role" parameterType="int">
+        select
+            r.*
+        from
+            t_role r,
+            t_user_role ur
+        where
+            r.id=ur.role_id and ur.user_id=#{userId}
+    </select>
+
+    <!--查询所有角色-->
+    <select id="findAll" resultType="role">
+        select * from t_role
+    </select>
+
+    <!--    findAllRole-->
+    <select id="findAllRole" resultType="role" parameterType="string">
+        select * from t_role
+        <if test="value!=null and value.length>0">
+            where name=#{value} or keyword=#{value}
+        </if>
+    </select>
+
+    <!--addRole-->
+    <insert id="addRole" parameterType="role">
+        <selectKey resultType="int" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into t_role values (
+        null ,#{name},#{keyword},#{description}
+        )
+    </insert>
+
+    <!--addMenuIds-->
+    <insert id="addMenuIds" parameterType="map">
+        insert into t_role_menu (role_id,menu_id) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.role_id},#{item.menu_id})
+        </foreach>
+    </insert>
+
+    <!--addPermissionIds-->
+
+    <insert id="addPermissionIds" parameterType="map">
+        insert into t_role_permission (role_id,permission_id) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.role_id},#{item.permission_id})
+        </foreach>
+    </insert>
+
+    <!--    deleteByIdMenuIds 删除中间表-->
+    <select id="deleteByIdMenuIds" parameterType="int">
+        delete from t_role_menu where role_id = #{id}
+    </select>
+
+    <select id="deleteByIdPermissionIds" parameterType="int">
+        delete from t_role_permission where role_id = #{id}
+    </select>
+
+    <select id="deleteByIdRole" parameterType="int">
+        delete from t_role where id = #{id}
+    </select>
+
+
+    <select id="findById" parameterType="int" resultType="role">
+        select * from t_role where id = #{id}
+    </select>
+
+    <select id="findMenuIdsById" parameterType="int" resultType="int">
+        select menu_id from t_role_menu where role_id = #{role_id}
+    </select>
+
+    <select id="findPermissionIdsById" parameterType="int" resultType="int">
+        select permission_id from t_role_permission where role_id = #{role_id}
+    </select>
+
+    <select id="edit" parameterType="role">
+        update t_role
+        <set>
+
+            <if test="name!=null and name.length>0">
+                name = #{name},
+            </if>
+
+            <if test="keyword!=null">
+                keyword = #{keyword},
+            </if>
+
+            <if test="description!=null">
+                description = #{description},
+            </if>
+
+        </set>
+        where id = #{id}
+    </select>
+
+
+
+
+
+
+</mapper>

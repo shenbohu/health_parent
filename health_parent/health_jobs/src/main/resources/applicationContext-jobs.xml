@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <!--    <bean id="jobDemo" class="com.JobDemo"></bean>-->
+
+    <!--    <bean id="jobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">-->
+
+
+    <!--    注入目标对象-->
+    <!--        <property name="targetObject" ref="jobDemo"/>-->
+    <!--    注入目标方法-->
+    <!--        <property name="targetMethod" value="run"/>-->
+    <!--    </bean>-->
+
+
+    <!--    注册一个触发器,指定任务的处罚时间-->
+
+    <!--    <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
+    <!--        <property name="jobDetail" ref="jobDetail"/>-->
+    <!--        <property name="cronExpression" value="0/10 * * * * ?"/>-->
+    <!--    </bean>-->
+    <!-- 注册一个统一的调度工厂，通过这个调度工厂调度任务 -->
+    <!--    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">-->
+    <!--        <property name="triggers">-->
+
+    <!-- 注入多个触发器 -->
+    <!--            <list>-->
+    <!--                <ref bean="cronTrigger"/>-->
+    <!--            </list>-->
+    <!--        </property>-->
+    <!--    </bean>-->
+
+
+
+    <!--开启task的名称空间-->
+
+    <!-- 包扫描-->
+    <context:component-scan base-package="com"/>
+    <!--开启task的注解支持-->
+    <task:annotation-driven/>
+</beans>

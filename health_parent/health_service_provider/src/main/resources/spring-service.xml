@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+							http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+							http://www.springframework.org/schema/context
+							http://www.springframework.org/schema/context/spring-context.xsd
+							http://www.springframework.org/schema/aop
+							http://www.springframework.org/schema/aop/spring-aop.xsd
+							http://www.springframework.org/schema/tx
+							http://www.springframework.org/schema/tx/spring-tx.xsd
+							http://www.springframework.org/schema/util
+							http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!--
+        接口
+        类   @Transactional
+        方法
+          默认是根据类有没有接口
+            如果有，采用JDK动态代理
+            如果没有，采用CIGLIB动态代理
+            如果指定了 proxy-target-class="true"，直接采用CIGLIB动态代理
+     -->
+    <tx:annotation-driven transaction-manager="transactionManager"
+                          proxy-target-class="true"/>
+
+</beans>
